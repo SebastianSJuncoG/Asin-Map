@@ -8,6 +8,11 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
 <style>
+  #map {
+  height: 500px; /* O usa 100vh si quieres que ocupe toda la pantalla */
+  width: 100%;
+  border: 2px solid #ccc; /* Añade esto temporalmente para ver si el div aparece */
+}
   :host {
     --bright-blue: oklch(51.01% 0.274 263.83);
     --electric-violet: oklch(53.18% 0.28 296.97);
@@ -177,7 +182,13 @@
   }
 </style>
 
-<main class="main">
+<h1>{{ page.title }}</h1>
+
+<div id="map"></div>
+
+<router-outlet></router-outlet>
+
+<!-- <main class="main">
   <div class="content">
     <div class="left-side">
       <svg
@@ -322,7 +333,7 @@
       </div>
     </div>
   </div>
-</main>
+</main> -->
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
