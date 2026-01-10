@@ -1,6 +1,25 @@
-
 <h1>{{ page.title }}</h1>
 
-<div id="map"></div>
+<br>
+
+<div class="controls">
+  <div class="input-group">
+    <input type="text" [(ngModel)]="ubication.centralCoordinate" (blur)="formatCoords()"
+      [pattern]="ubication.regularExpresion" [placeholder]="page.placeHolderInputCoordinate" />
+
+    <div *ngIf="page.alertError" class="error-text">
+      Formato inválido. Usa: Latitud, Longitud
+    </div>
+  </div>
+
+  <button class="btn-icon" (click)="clearLastMarkers()">🔎</button>
+  <button class="btn-text" (click)="clearLastMarkers()">Limpiar Mapa</button>
+</div>
+
+<br>
+
+<div class="controls">
+  <div id="map"></div>
+</div>
 
 <router-outlet />
