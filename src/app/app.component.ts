@@ -22,9 +22,9 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   public ubication = {
     inicialCoordinate: [4.6440635, -74.1218681],
-    centralCoordinate: null,
+    centralCoordinate: [] as number[],
     regularExpresion: /^-?\d+(\.\d+)?,\s?-?\d+(\.\d+)?$/,
-    zoom: 16,
+    zoom: 19,
     title: "Plaza de nariño",
     text: "Plaza central",
     coordsNews: "",
@@ -56,26 +56,17 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   public formatCoords() {
-    console.log(this.ubication.centralCoordinate);
-    if(this.ubication.centralCoordinate && this.ubication.regularExpresion.test(this.ubication.centralCoordinate)){
-      console.log("Valido");
+    if(this.ubication.inputCoordinate && this.ubication.regularExpresion.test(this.ubication.inputCoordinate)){
       this.page.alertError = false;
+      this.ubication.centralCoordinate = this.ubication.inputCoordinate.split(",").map(c => parseFloat(c.trim()));
+
+      this.centerMap(this.ubication.centralCoordinate[0], this.ubication.centralCoordinate[1]);
+      this.setAMarker(this.ubication.centralCoordinate[0], this.ubication.centralCoordinate[1]);
+
     }else{
-      console.log("invalido");
       this.page.alertError = true;
+
     }
-    //console.log(coordenate.value);
-    // if (this.ubication.centralCoordinate) {
-    //   const newCoordenate = this.ubication.centralCoordinate.toString().replace(/\s+/g, '');
-    //   const coordenateArray = newCoordenate.split(",");
-    //   // this.ubication.centralCoordinate = [coordenateArray[0], coordenateArray[1]];
-    //   // console.log(`Latitud: ${this.ubication.centralCoordinate[0]} - Longitud: ${this.ubication.centralCoordinate[1]}`);
-
-    //   this.recentrarMapa(this.ubication.inicialCoordinate[0], this.ubication.inicialCoordinate[1]);
-
-    //   console.log(this.ubication.centralCoordinate);
-
-    // }
   }
 
   // Evento que detecta las coordenadas sobre el lugar en donde se dio click en el mapa
@@ -112,8 +103,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   private centerMap(lat: number, lng: number) {
     if (this.map) {
-      console.log(`Latitud: ${lat} - Longitud: ${lng}`);
-      this.map.setView([lat, lng], 13);
+      this.map.setView([lat, lng], this.ubication.zoom);
     }
   }
 }

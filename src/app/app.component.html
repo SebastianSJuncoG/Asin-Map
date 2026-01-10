@@ -4,7 +4,7 @@
 
 <div class="controls">
   <div class="input-group">
-    <input type="text" [(ngModel)]="ubication.centralCoordinate" (blur)="formatCoords()"
+    <input type="text" [(ngModel)]="ubication.inputCoordinate" (blur)="formatCoords()"
       [pattern]="ubication.regularExpresion" [placeholder]="page.placeHolderInputCoordinate" />
 
     <div *ngIf="page.alertError" class="error-text">
@@ -12,7 +12,7 @@
     </div>
   </div>
 
-  <button class="btn-icon" (click)="clearLastMarkers()">🔎</button>
+  <button class="btn-icon" (click)="formatCoords()">🔎</button>
   <button class="btn-text" (click)="clearLastMarkers()">Limpiar Mapa</button>
 </div>
 
