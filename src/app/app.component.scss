@@ -6,12 +6,21 @@
     /* Añade esto temporalmente para ver si el div aparece */
 }
 
+.contentMap{
+    width: 70%;
+}
+
+.contentInfo{
+    width: 28%;
+}
+
 .controls {
     display: flex;
+    background: #e5e5e5;
     gap: 10px;
     align-items: flex-start;
     padding: 15px;
-    background: white;
+    margin: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
