@@ -25,5 +25,32 @@
   <div class="controls contentMap">
     <div id="map"></div>
   </div>
+
+  <!-- Buscador de ruta -->
+  <div class="controls contentInfo">
+    <div class="input-group">
+      <input type="text" [(ngModel)]="ubication.inputOrigin" (blur)="foundCoords()"
+        [pattern]="ubication.regularExpresion" [placeholder]="origenDestino.placeHolderOrigin" />
+
+      <div *ngIf="page.alertError" class="error-text">
+        Formato inválido. Usa: Latitud, Longitud
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class="input-group">
+      <input type="text" [(ngModel)]="ubication.inputOrigin" (blur)="foundCoords()"
+        [pattern]="ubication.regularExpresion" [placeholder]="origenDestino.placeHolderOrigin" />
+
+      <div *ngIf="page.alertError" class="error-text">
+        Formato inválido. Usa: Latitud, Longitud
+      </div>
+    </div>
+
+
+
+    <button class="btn-icon" (click)="foundCoords()">🔎</button>
+    <button class="btn-text" (click)="clearLastMarkers()">Limpiar Mapa</button>
+  </div>
 </div>
 <router-outlet />
