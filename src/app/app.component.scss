@@ -61,3 +61,26 @@
         }
     }
 }
+
+#directions-container {
+  margin-top: 15px;
+  border: 1px solid #ddd;
+  background: #fff;
+  width: 100%;
+  min-height: 50px;
+
+  /* IMPORTANTE: Esto quita el panel del mapa y lo deja en tu div */
+  .leaflet-routing-container {
+    position: static !important; /* Quita el modo flotante */
+    width: 100% !important;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: none !important;
+    padding: 10px;
+  }
+}
+
+/* Oculta el botón de cerrar que Leaflet pone por defecto */
+.leaflet-routing-collapse-btn {
+  display: none;
+}

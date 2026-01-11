@@ -18,12 +18,30 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     urlAttribution: "http://www.openstreetmap.org/copyright",
     textAttribution: "OpenStreetMap",
     placeHolderInputCoordinate: "Coordenadas ...",
-    alertError: false
+    alertErrorSearch: false,
+    camionIcon: "icons/punto.png"
   }
 
-  public origenDestino = {
+  private truckIcon = L.icon({
+    iconUrl: 'icons/camion.png', // Aquí sí va el texto con el path
+    iconSize: [40, 40],         // Obligatorio para que se vea bien
+    iconAnchor: [20, 40]        // El punto de la imagen que toca la coordenada
+  });
+
+  private destinationIcon = L.icon({
+    iconUrl: 'icons/ubicacion.png', // Aquí sí va el texto con el path
+    iconSize: [40, 40],         // Obligatorio para que se vea bien
+    iconAnchor: [20, 40]        // El punto de la imagen que toca la coordenada
+  });
+
+  public originDestination = {
     placeHolderOrigin: "Origen ...",
-    placeHolderDestination: "Destino ..."
+    placeHolderDestination: "Destino ...",
+    regularExpresion: /^-?\d+(\.\d+)?,\s?-?\d+(\.\d+)?$/,
+    inputOrigin: "",
+    alertErrorOrigin: false,
+    inputDestination: "",
+    alertErrorDestination: false,
   }
 
   public ubication = {
@@ -34,9 +52,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     title: "Plaza de nariño",
     text: "Plaza central",
     coordsNews: "",
-    inputCoordinate: "",
-    inputOrigin: "",
-    inputDestination: ""
+    inputCoordinate: ""
   }
 
   private map: L.Map | undefined;
@@ -47,7 +63,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
     if (this.map) {
       this.initializeMap(this.ubication.inicialCoordinate[0], this.ubication.inicialCoordinate[1]);
-      this.generarRuta();
+      //this.routeGenerate();
 
       this.map.on('click', this.onMapClick);
     }
@@ -66,34 +82,69 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   public foundCoords() {
-    this.ubication.centralCoordinate = this.formatCoords(this.ubication.inputCoordinate);
-    if (this.ubication.centralCoordinate.length > 0) {
-      this.page.alertError = false;
+    const inputValid = this.formatCoords(this.ubication.inputCoordinate);
+
+    this.ubication.centralCoordinate = inputValid[0];
+    if (inputValid[1]) {
       this.centerMap(this.ubication.centralCoordinate[0], this.ubication.centralCoordinate[1]);
       this.setAMarker(this.ubication.centralCoordinate[0], this.ubication.centralCoordinate[1]);
+      this.page.alertErrorSearch = !inputValid[1];
 
     } else {
-      this.page.alertError = true;
+      this.page.alertErrorSearch = !inputValid[1];
+
+    }
+  }
+
+  public foundRoute() {
+    const inputValidOrigin = this.formatCoords(this.originDestination.inputOrigin);
+    const inputValidDestination = this.formatCoords(this.originDestination.inputDestination);
+
+    if (inputValidOrigin[1] && inputValidDestination[1]) {
+      this.routeGenerate(inputValidOrigin[0], inputValidDestination[0]);
+      this.centerMap(inputValidOrigin[0][0], inputValidOrigin[0][1]);
+      this.originDestination.alertErrorOrigin = !inputValidOrigin[1];
+      this.originDestination.alertErrorDestination = !inputValidOrigin[1];
+
+    } else {
+      this.originDestination.alertErrorOrigin = !inputValidOrigin[1];
+      this.originDestination.alertErrorDestination = !inputValidOrigin[1];
 
     }
   }
 
   public deleteSearch() {
     this.ubication.inputCoordinate = "";
-    this.page.alertError = false;
+    this.page.alertErrorSearch = false;
   }
 
-  public generarRuta() {
-    const origen = L.latLng(4.644, -74.121);
-    const destino = L.latLng(this.ubication.centralCoordinate[0], this.ubication.centralCoordinate[1]);
+  public routeGenerate(origin: number[], destination: number[]) {
+    const origen = L.latLng(origin[0], origin[1]);
+    const destino = L.latLng(destination[0], destination[1]);
+    const container = document.getElementById('directions-container');
 
     (L as any).Routing.control({
       waypoints: [origen, destino],
+      language: 'es',
+      createMarker: (i: number, waypoint: any, n: number) => {
+        // Para el punto de origen
+        if (i === 0) {
+          return L.marker(waypoint.latLng, { icon: this.truckIcon });
+        }
+        // Para el destino o puntos intermedios
+        return L.marker(waypoint.latLng, { icon: this.destinationIcon });
+      },
+      container: container,
+      show: true,
+      itinerary: {
+        collapsible: false // Mantenerlo abierto siempre ya que está afuera
+      },
       lineOptions: {
         styles: [{ color: 'blue', weight: 4 }]
       },
       routeWhileDragging: true,
-      addWaypoints: false
+      addWaypoints: false,
+      collapsible: true,
     }).addTo(this.map);
   }
 
@@ -136,7 +187,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   private customIcon = L.icon({
-    iconUrl: 'icons/camion.png', // Ruta a tu imagen en la carpeta assets
+    iconUrl: this.page.camionIcon, // Ruta a tu imagen en la carpeta assets
     shadowUrl: '', // Opcional: sombra del marcador
 
     iconSize: [25, 41],
@@ -145,12 +196,12 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     shadowSize: [41, 41]
   });
 
-  private formatCoords(coords: string): number[] {
-    if (this.ubication.inputCoordinate && this.ubication.regularExpresion.test(this.ubication.inputCoordinate)) {
-      return this.ubication.inputCoordinate.split(",").map(c => parseFloat(c.trim()))
+  private formatCoords(coords: string): [number[], boolean] {
+    if (coords && this.ubication.regularExpresion.test(coords)) {
+      return [coords.split(",").map(c => parseFloat(c.trim())), true]
 
     } else {
-      return [];
+      return [[], false];
     }
   }
 }

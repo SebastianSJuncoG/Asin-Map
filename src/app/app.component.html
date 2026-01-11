@@ -4,15 +4,13 @@
 <!-- Buscador de puntos -->
 <div class="controls">
   <div class="input-group">
-    <input type="text" [(ngModel)]="ubication.inputCoordinate" (blur)="foundCoords()"
+    <input type="text" [(ngModel)]="ubication.inputCoordinate"
       [pattern]="ubication.regularExpresion" [placeholder]="page.placeHolderInputCoordinate" />
 
-    <div *ngIf="page.alertError" class="error-text">
+    <div *ngIf="page.alertErrorSearch" class="error-text">
       Formato inválido. Usa: Latitud, Longitud
     </div>
   </div>
-
-  
 
   <button class="btn-icon" (click)="foundCoords()">🔎</button>
   <button class="btn-text" (click)="clearLastMarkers()">Limpiar Mapa</button>
@@ -28,28 +26,31 @@
 
   <!-- Buscador de ruta -->
   <div class="controls contentInfo">
+    <!-- Origen -->
     <div class="input-group">
-      <input type="text" [(ngModel)]="ubication.inputOrigin" (blur)="foundCoords()"
-        [pattern]="ubication.regularExpresion" [placeholder]="origenDestino.placeHolderOrigin" />
+      <input type="text" [(ngModel)]="originDestination.inputOrigin"
+        [pattern]="originDestination.regularExpresion" [placeholder]="originDestination.placeHolderOrigin" />
 
-      <div *ngIf="page.alertError" class="error-text">
+      <div *ngIf="originDestination.alertErrorOrigin" class="error-text">
         Formato inválido. Usa: Latitud, Longitud
       </div>
     </div>
     <br>
     <br>
+    <!-- Destino -->
     <div class="input-group">
-      <input type="text" [(ngModel)]="ubication.inputOrigin" (blur)="foundCoords()"
-        [pattern]="ubication.regularExpresion" [placeholder]="origenDestino.placeHolderOrigin" />
+      <input type="text" [(ngModel)]="originDestination.inputDestination"
+        [pattern]="originDestination.regularExpresion" [placeholder]="originDestination.placeHolderDestination" />
 
-      <div *ngIf="page.alertError" class="error-text">
+      <div *ngIf="originDestination.alertErrorDestination" class="error-text">
         Formato inválido. Usa: Latitud, Longitud
       </div>
+
+      <!-- Direcciones -->
+      <div id="directions-container"></div>
     </div>
 
-
-
-    <button class="btn-icon" (click)="foundCoords()">🔎</button>
+    <button class="btn-icon" (click)="foundRoute()">🔎</button>
     <button class="btn-text" (click)="clearLastMarkers()">Limpiar Mapa</button>
   </div>
 </div>
