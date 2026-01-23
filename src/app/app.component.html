@@ -4,8 +4,8 @@
 <!-- Buscador de puntos -->
 <div class="controls">
   <div class="input-group">
-    <input type="text" [(ngModel)]="ubication.inputCoordinate"
-      [pattern]="ubication.regularExpresion" [placeholder]="page.placeHolderInputCoordinate" />
+    <input type="text" [(ngModel)]="ubication.inputCoordinate" [pattern]="ubication.regularExpresion"
+      [placeholder]="page.placeHolderInputCoordinate" />
 
     <div *ngIf="page.alertErrorSearch" class="error-text">
       Formato inválido. Usa: Latitud, Longitud
@@ -13,7 +13,15 @@
   </div>
 
   <button class="btn-icon" (click)="foundCoords()">🔎</button>
-  <button class="btn-text" (click)="clearLastMarkers()">Limpiar Mapa</button>
+  <button class="btn-text" (click)="clearLastMarkers()">Limpiar Marcador</button>
+
+  <br>
+  <div class="checkbox-group">
+    <label>
+      <input type="checkbox" [(ngModel)]="multipleRoute" (change)="onCheckboxChange()">
+      Multiples rutas
+    </label>
+  </div>
 </div>
 
 <br>
@@ -25,11 +33,11 @@
   </div>
 
   <!-- Buscador de ruta -->
-  <div class="controls contentInfo">
+  <div class="controls contentInfo" *ngIf="!multipleRoute">
     <!-- Origen -->
     <div class="input-group">
-      <input type="text" [(ngModel)]="originDestination.inputOrigin"
-        [pattern]="originDestination.regularExpresion" [placeholder]="originDestination.placeHolderOrigin" />
+      <input type="text" [(ngModel)]="originDestination.inputOrigin" [pattern]="originDestination.regularExpresion"
+        [placeholder]="originDestination.placeHolderOrigin" />
 
       <div *ngIf="originDestination.alertErrorOrigin" class="error-text">
         Formato inválido. Usa: Latitud, Longitud
@@ -39,19 +47,53 @@
     <br>
     <!-- Destino -->
     <div class="input-group">
-      <input type="text" [(ngModel)]="originDestination.inputDestination"
-        [pattern]="originDestination.regularExpresion" [placeholder]="originDestination.placeHolderDestination" />
+      <input type="text" [(ngModel)]="originDestination.inputDestination" [pattern]="originDestination.regularExpresion"
+        [placeholder]="originDestination.placeHolderDestination" />
 
       <div *ngIf="originDestination.alertErrorDestination" class="error-text">
         Formato inválido. Usa: Latitud, Longitud
       </div>
 
       <!-- Direcciones -->
-      <div id="directions-container"></div>
+      <div id="directions-container">
+        <p>Rutas individuales</p>
+      </div>
     </div>
 
     <button class="btn-icon" (click)="foundRoute()">🔎</button>
     <button class="btn-text" (click)="clearLastMarkers()">Limpiar Mapa</button>
+  </div>
+
+  <!-- Buscador de multiples rutas -->
+  <div class="controls contentInfo" *ngIf="multipleRoute">
+    <!-- Origen -->
+    <div class="input-group">
+      <input type="text" [(ngModel)]="originDestination.inputOrigin" [pattern]="originDestination.regularExpresion"
+        [placeholder]="originDestination.placeHolderOrigin" />
+
+      <div *ngIf="originDestination.alertErrorOrigin" class="error-text">
+        Formato inválido. Usa: Latitud, Longitud
+      </div>
+    </div>
+    <br>
+    <br>
+    <!-- Destino -->
+    <div class="input-group">
+      <input type="text" [(ngModel)]="originDestination.inputDestination" [pattern]="originDestination.regularExpresion"
+        [placeholder]="originDestination.placeHolderDestination" />
+
+      <div *ngIf="originDestination.alertErrorDestination" class="error-text">
+        Formato inválido. Usa: Latitud, Longitud
+      </div>
+
+      <!-- Direcciones -->
+      <div id="directions-container">
+        <p>Multiples rutas</p>
+      </div>
+    </div>
+
+    <button class="btn-icon" (click)="foundRoute()">🔎</button>
+    <button class="btn-text" (click)="clearMap()">Limpiar Mapa</button>
   </div>
 </div>
 <router-outlet />

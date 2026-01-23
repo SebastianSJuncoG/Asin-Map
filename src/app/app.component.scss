@@ -65,13 +65,16 @@
 #directions-container {
   margin-top: 15px;
   border: 1px solid #ddd;
-  background: #fff;
+  background: #fdfdfd;
   width: 100%;
-  min-height: 50px;
+  
+  /* AJUSTE CLAVE: Altura máxima para todo el bloque de direcciones */
+  max-height: 500px; 
+  overflow-y: auto; 
+  padding: 5px;
 
-  /* IMPORTANTE: Esto quita el panel del mapa y lo deja en tu div */
   .leaflet-routing-container {
-    position: static !important; /* Quita el modo flotante */
+    position: static !important; 
     width: 100% !important;
     max-height: 400px;
     overflow-y: auto;
@@ -80,7 +83,6 @@
   }
 }
 
-/* Oculta el botón de cerrar que Leaflet pone por defecto */
 .leaflet-routing-collapse-btn {
   display: none;
 }

@@ -28,6 +28,8 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     iconAnchor: [20, 40]        // El punto de la imagen que toca la coordenada
   });
 
+  public multipleRoute: boolean = false;
+
   private destinationIcon = L.icon({
     iconUrl: 'icons/ubicacion.png', // Aquí sí va el texto con el path
     iconSize: [40, 40],         // Obligatorio para que se vea bien
@@ -55,6 +57,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     inputCoordinate: ""
   }
 
+  private allRoutingControls: any[] = [];
   private map: L.Map | undefined;
   private lastMarker: L.Marker | undefined;
 
@@ -71,6 +74,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.removeMap();
+  }
+
+  onCheckboxChange() {
+    console.log('¿Mostrar instrucciones?:', this.multipleRoute);
+    // Aquí puedes ejecutar lógica extra, como limpiar el div si se desmarca
   }
 
   // Elimina el ultimo marcador colocado
@@ -101,7 +109,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     const inputValidDestination = this.formatCoords(this.originDestination.inputDestination);
 
     if (inputValidOrigin[1] && inputValidDestination[1]) {
-      this.routeGenerate(inputValidOrigin[0], inputValidDestination[0]);
+      if(this.multipleRoute){
+        this.generateMultipleRoutes(inputValidOrigin[0], inputValidDestination[0]);
+      }else{
+        this.routeGenerate(inputValidOrigin[0], inputValidDestination[0]);
+      }
       this.centerMap(inputValidOrigin[0][0], inputValidOrigin[0][1]);
       this.originDestination.alertErrorOrigin = !inputValidOrigin[1];
       this.originDestination.alertErrorDestination = !inputValidOrigin[1];
@@ -118,6 +130,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this.page.alertErrorSearch = false;
   }
 
+  // Genera una unica ruta
   public routeGenerate(origin: number[], destination: number[]) {
     const origen = L.latLng(origin[0], origin[1]);
     const destino = L.latLng(destination[0], destination[1]);
@@ -127,17 +140,15 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       waypoints: [origen, destino],
       language: 'es',
       createMarker: (i: number, waypoint: any, n: number) => {
-        // Para el punto de origen
         if (i === 0) {
           return L.marker(waypoint.latLng, { icon: this.truckIcon });
         }
-        // Para el destino o puntos intermedios
         return L.marker(waypoint.latLng, { icon: this.destinationIcon });
       },
       container: container,
       show: true,
       itinerary: {
-        collapsible: false // Mantenerlo abierto siempre ya que está afuera
+        collapsible: false 
       },
       lineOptions: {
         styles: [{ color: 'blue', weight: 4 }]
@@ -146,6 +157,53 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       addWaypoints: false,
       collapsible: true,
     }).addTo(this.map);
+  }
+
+  public generateMultipleRoutes(origin: number[], destination: number[], color: string = 'red') {
+    const origen = L.latLng(origin[0], origin[1]);
+    const destino = L.latLng(destination[0], destination[1]);
+
+    // Creamos el control
+    const routingControl = (L as any).Routing.control({
+      waypoints: [origen, destino],
+      language: 'es',
+      fitSelectedRoutes: true, // Esto asegura que el mapa se mueva a la ruta
+      show: true,
+      addWaypoints: false,
+      createMarker: (i: number, waypoint: any) => {
+        return L.marker(waypoint.latLng, {
+          icon: i === 0 ? this.truckIcon : this.destinationIcon
+        });
+      },
+      lineOptions: {
+        styles: [{ color: color, weight: 6, opacity: 0.8 }]
+      }
+    }).addTo(this.map);
+
+    this.allRoutingControls.push(routingControl);
+
+    // ESCUCHAMOS EL EVENTO CORRECTO
+    routingControl.on('routesfound', (e: any) => {
+      // FIX: Usamos getContainer() directamente sobre el control
+      // O usamos e.target.getContainer()
+      const itineraryContainer = routingControl.getContainer();
+      const targetDiv = document.getElementById('directions-container');
+
+      if (targetDiv && itineraryContainer) {
+        // Si quieres múltiples rutas, crea un contenedor para cada una
+        const routeWrapper = document.createElement('div');
+        routeWrapper.className = 'route-itinerary-item';
+        routeWrapper.innerHTML = `<h4 style="color: ${color}; margin: 10px 0;">Ruta #${this.allRoutingControls.length}</h4>`;
+
+        // Movemos el panel de instrucciones de Leaflet dentro de nuestro wrapper
+        routeWrapper.appendChild(itineraryContainer);
+        targetDiv.appendChild(routeWrapper);
+      }
+    });
+
+    routingControl.on('routingerror', (err: any) => {
+      console.error('Error de cálculo:', err);
+    });
   }
 
   // Evento que detecta las coordenadas sobre el lugar en donde se dio click en el mapa
@@ -203,5 +261,21 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     } else {
       return [[], false];
     }
+  }
+
+  public clearMap() {
+    this.allRoutingControls.forEach(control => {
+      this.map?.removeControl(control);
+    });
+    this.allRoutingControls = [];
+
+    this.map?.eachLayer((layer: any) => {
+      if (!!layer.toGeoJSON && !layer.hasOwnProperty('_url')) {
+        this.map?.removeLayer(layer);
+      }
+    });
+
+    const targetDiv = document.getElementById('directions-container');
+    if (targetDiv) targetDiv.innerHTML = '';
   }
 }
