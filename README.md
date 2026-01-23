@@ -3,6 +3,9 @@
 Demo de un mapa con las siguientes funcionalidades:
 
 - Inserción de marcas según con ayuda del click izquierdo.
-- Ingreso de coordenadas desde un input para ajustar el mapa según lo indicado. (En progreso)
-- Visualización de rutas. (Proximamente)
+- Generación de rutas individuales
+  - Mover las direcciones a un div fuera del mapa. (Pendiente)
+- Generación de rutas grupales
+ - se movieron las direcciones a un div fuera del mapa.
+- Se visializan las rutas.
 - Generación de geocercas. (Proximamente)
